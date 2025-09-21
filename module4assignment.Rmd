@@ -1,0 +1,87 @@
+---
+title: "4.1 Assignment"
+author: "Joe Prillaman"
+date: "2025-09-20"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+^Unsure what this is but not deleting it
+Install lpsolveapi package
+```{r}
+install.packages("lpSolveAPI")
+```
+Now load the library
+```{r}
+library(lpSolveAPI)
+```
+Setting up the Weigelt Corp example problem for Module 4 assignment
+```{r}
+# Create an lp object with 0 constraints & 9 decision variables
+lprec <- make.lp(0,9)
+
+# Now create the objective function. Setting coefficients for the 9 decision variables.
+set.objfn(lprec, c(420,420,420,360,360,360,300,300,300))
+
+# Since default is  min, set direction to max
+lp.control(lprec,sense='max')
+
+# Now add the constraint variables (no need to set non-negativity constraints)
+add.constraint(lprec, c(1,0,0,1,0,0,1,0,0), "<=", 750)
+add.constraint(lprec, c(0,1,0,0,1,0,0,1,0), "<=", 900)
+add.constraint(lprec, c(0,0,1,0,0,1,0,0,1), "<=", 450)
+add.constraint(lprec, c(1,1,1,0,0,0,0,0,0), "<=", 900)
+add.constraint(lprec, c(0,0,0,1,1,1,0,0,0), "<=", 1200)
+add.constraint(lprec, c(0,0,0,0,0,0,1,1,1), "<=", 750)
+add.constraint(lprec, c(20,0,0,15,0,0,12,0,0), "<=", 13000)
+add.constraint(lprec, c(0,20,0,0,15,0,0,12,0), "<=", 12000)
+add.constraint(lprec, c(0,0,20,0,0,15,0,0,12), "<=", 5000)
+
+# Set bounds for variables (Setting non-negativity just for an example for future reference)
+set.bounds(lprec,lower = c(0,0,0,0,0,0,0,0,0), columns = c(1,2,3,4,5,6,7,8,9))
+
+# In order to ID variables and constraints in output we set row & column names
+rownames <- c("Plant1ProdCap","Plant2ProdCap","Plant3ProdCap","LgSalesFcst","MdSalesFcst","SmSalesFcst","Plant1StrgCap","Plant2StrgCap","Plant3StrgCap")
+
+colnames <- c("LrgPlant1","LrgPlant2","LrgPlant3","MedPlant1","MedPlant2","MedPlant3","SmPlant1","SmPlant2","SmPlant3")
+
+dimnames(lprec) <- list(rownames,colnames)
+
+# Print the Model
+lprec
+
+# The model can also now be saved to a file
+write.lp(lprec,filename = "module4assignmentsolve", type = "lp")
+```
+Now solve the LP Model
+```{r}
+solve(lprec)
+```
+solve doesnt show the solution, it just shows there was a successful solution if 0 is output
+next outp ut the obj function value and variables to see our solution
+
+```{r}
+get.objective(lprec)
+get.variables(lprec)
+```
+
+```{r}
+# Create an lp object called m4
+
+m4 <- read.lp("module4assignmentsolve.lp")
+m4
+
+```
+
+
+```{r}
+solve(m4)
+get.objective(m4)
+get.variables(m4)
+get.constraints(m4)
+```
+
+
+
+
